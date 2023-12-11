@@ -1,0 +1,11 @@
+{% block title %}Recycle Crew{% endblock %}
+<form action="/recycleCrew2">
+<label>Select Flight to recycle crew: </label>
+<select name="option" width="3000px">
+{% for o in items %}
+    <option value="{{o.flightID }}" SELECTED>{{ o.flightID }}</option>
+{% endfor %}
+</select>
+     <input type="submit" class="btn btn-default" value="Submit"/>
+</form>
+

@@ -1,0 +1,41 @@
+{% extends "template.html" %}
+{% block action %}"/addFlightReq"{% endblock %}
+{% block function %}"Add"{% endblock %}
+{% block fields %}
+<label class="form-control" name="airflightitle" style="font-weight:bold">Add Flight</label>
+   <br>
+    flightID:
+    <br>
+    <input type="text" class="form-control" name="flightID" required>
+    <br>
+    routeID:
+    <br>
+    <input type="text" class="form-control" name="routeID" required>
+    <br>
+    support_airline:
+    <br>
+    <input type="text" class="form-control" name="support_airline">
+    <br>
+    support_tail:
+    <br>
+    <input type="text" class="form-control" name="support_tail">
+    <br>
+    progress:
+    <br>
+    <input type="number" class="form-control" name="progress">
+    <br>
+    airplane_status:
+    <br>
+    <input type="text" class="form-control" name="airplane_status">
+    <br>
+    next_time:
+    <br>
+    <input type="text" class="form-control" name="next_time">
+    <br>
+    cost:
+    <br>
+    <input type="number" class="form-control" name="cost">
+    <br>
+
+
+{% endblock %}

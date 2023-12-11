@@ -1,0 +1,57 @@
+{% extends "template.html" %}
+<!--{% block action %}"/addairplaneReq"{% endblock %}-->
+
+{% block function %}"Add"{% endblock %}
+{% block fields %}
+<form action="/airlineInfo">
+<label class="form-control" name="airplaneitle" style="font-weight:bold">Add AirPlane</label>
+    <br>
+
+
+    <table >
+        <tr>
+            <td >
+
+                <label>Airline :</label>
+                <select name="option1" width="3000px" class="form-control" required>
+                    {% for o in items %}
+                        {% if o.airlineID is defined and not empty%}
+                            <option value="{{o.airlineID}}" SELECTED>{{ o.airlineID }}</option>
+                        {% endif %}
+                     {% endfor %}
+                </select>
+
+            </td>
+            <td >  <label>Location :</label>
+                <select name="option2" width="3000px" class="form-control" >
+                    {% for o in items %}
+                        {% if o.locationID is defined and not empty %}
+                            <option value="{{o.locationID}}" SELECTED>{{o.locationID}}</option>
+                        {% else %}
+                            NONE
+                        {% endif %}
+                    {% endfor %}
+                </select>
+              </td>
+        </tr>
+        <tr>
+            <td >Jet Engines: <input type="text" class="form-control" name="jetengines"></td>
+            <td>Plane Type:   <input type="text" class="form-control" name="plane_type" required></td>
+        </tr>
+         <tr>
+            <td>Tail Num:   <input type="text" class="form-control" name="tail_num" required></td>
+            <td>Skids:   <input type="text" class="form-control" name="skids" ></td>
+        </tr>
+         <tr>
+            <td>Seat Capacity:   <input type="number" class="form-control" name="seat_capacity" required><p></p></td>
+            <td>Propeller:   <input type="text" class="form-control" name="propeller"></td>
+        </tr>
+         <tr>
+            <td>Speed:   <input type="number" class="form-control" name="speed" required><p></p></td>
+            <td ></td>
+        </tr>
+
+    </table>
+
+
+{% endblock %}

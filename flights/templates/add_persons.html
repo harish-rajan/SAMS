@@ -1,0 +1,41 @@
+{% extends "template.html" %}
+{% block action %}"/addPersonReq"{% endblock %}
+{% block function %}"Add"{% endblock %}
+{% block fields %}
+    <br>
+    personId:
+    <br>
+    <input type="text" class="form-control" name="personID">
+    <br>
+    first_name:
+    <br>
+    <input type="text" class="form-control" name="first_name">
+    <br>
+    last_name:
+    <br>
+    <input type="text" class="form-control" name="last_name">
+    <br>
+    locationID:
+    <br>
+    <input type="text" class="form-control" name="locationID">
+    <br>
+    tax_ID:
+    <br>
+    <input type="text" class="form-control" name="tax_ID">
+    <br>
+    experience:
+    <br>
+    <input type="text" class="form-control" name="experience">
+    <br>
+    miles:
+    <br>
+    <input type="text" class="form-control" name="miles">
+    <br>
+    funds:
+    <br>
+    <input type="text" class="form-control" name="funds">
+    <br>
+
+
+
+{% endblock %}

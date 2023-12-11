@@ -1,0 +1,12 @@
+{% extends "template.html" %}
+{% block action %}"/addLocationReq"{% endblock %}
+{% block function %}"Add"{% endblock %}
+{% block fields %}
+   <label class="form-control" name="airlocationtitle" style="font-weight:bold">Add Location</label>
+    <br>
+    locationID:
+    <br>
+    <input type="text" class="form-control" name="locationID">
+    <br>
+
+{% endblock %}
