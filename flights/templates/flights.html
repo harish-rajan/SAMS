@@ -1,0 +1,45 @@
+{% extends "view.html" %}
+{% block content %}
+<div>
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col">
+                <h1>Flights</h1>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#offerFlight">Offer Flight</button>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Airline</th>
+                    <th scope="col">Flight Number</th>
+                    <th scope="col">Aircraft Tail Number</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Route</th>
+                    <th scope="col">Progress</th>
+                    <th scope="col">Departure Airport</th>
+                    <th scope="col">Arrival Airport</th>
+                    <th scope="col">Next Takeoff/Landing</th>
+                    <th scope="col">Cost</th>
+                </tr>
+            </thead>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    {% for col in cols %}
+                    <td>{{ item[col] }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}
