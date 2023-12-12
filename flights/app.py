@@ -236,6 +236,8 @@ def flights():
     except Exception as e:
         return render_template("flights.html", items=[], cols=[], success='Error: ' + str(e))
 
+## this is wrong
+
 @app.route('/addFlightReq', methods=['GET'])
 def add_flights():
     flightID = request.args.get('flightID').strip()
@@ -263,6 +265,28 @@ def add_flights():
             connection.commit()
             return redirect('/flights')
 
+    except Exception as e:
+        return redirect('/flights')
+    
+@app.route('/flights/<flightID>/takeoff')
+def takeoff(flightID):
+    try:
+        with connection.cursor() as cursor:
+            args = (flightID)
+            cursor.callproc('flight_takeoff', args)
+            connection.commit()
+            return redirect('/flights')
+    except Exception as e:
+        return redirect('/flights')
+    
+@app.route('/flights/<flightID>/landing')
+def landing(flightID):
+    try:
+        with connection.cursor() as cursor:
+            args = (flightID)
+            cursor.callproc('flight_landing', args)
+            connection.commit()
+            return redirect('/flights')
     except Exception as e:
         return redirect('/flights')
     

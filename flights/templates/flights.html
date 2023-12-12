@@ -19,6 +19,7 @@
                     <th scope="col">Flight Number</th>
                     <th scope="col">Aircraft Tail Number</th>
                     <th scope="col">Status</th>
+                    <th scope="col"></th>
                     <th scope="col">Route</th>
                     <th scope="col">Progress</th>
                     <th scope="col">Departure Airport</th>
@@ -31,9 +32,23 @@
             <tbody>
                 {% for item in items %}
                 <tr>
-                    {% for col in cols %}
-                    <td>{{ item[col] }}</td>
-                    {% endfor %}
+                    <td>{{ item['support_airline'] }}</td>
+                    <td>{{ item['flightID'] }}</td>
+                    <td>{{ item['support_tail'] }}</td>
+                    <td>{{ item['airplane_status'] }}</td>
+                    <td>
+                        {% if item['airplane_status'] == 'on_ground' %}
+                        <a class="btn btn-link" href="/flights/{{ item['flightID'] }}/takeoff">Takeoff</a>
+                        {% else %}
+                        <a class="btn btn-link" href="/flights/{{ item['flightID'] }}/landing">Land</a>
+                        {% endif %}
+                    </td>
+                    <td>{{ item['routeID'] }}</td>
+                    <td>{{ item['progress'] }}</td>
+                    <td>{{ item['departure'] }}</td>
+                    <td>{{ item['arrival'] }}</td>
+                    <td>{{ item['next_time'] }}</td>
+                    <td>{{ item['cost'] }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
