@@ -215,9 +215,56 @@ def flights():
             cols = ['support_airline', 'flightID', 'support_tail', 'airplane_status', 'routeID', 'progress', 'departure', 'arrival', 'next_time', 'cost']
             cursor.execute(sql)
             items = cursor.fetchall()
-            return render_template("flights.html", items=items, cols=cols, success='')
+
+            sql2 = "select routeID from route"
+            cursor.execute(sql2)
+            routes = cursor.fetchall()
+
+            sql3 = "select airlineID from airline"
+            cursor.execute(sql3)
+            airlines = cursor.fetchall()
+
+            sql4 = "select airlineID, tail_num from airplane"
+            cursor.execute(sql4)
+            airplanes = cursor.fetchall()
+
+            sql5 = "select routeID, max(sequence) as sequence from route_path group by routeID"
+            cursor.execute(sql5)
+            max_progress = cursor.fetchall()
+
+            return render_template("flights.html", items=items, cols=cols, routes=routes, airlines=airlines, airplanes=airplanes, max_progress=max_progress, success='')
     except Exception as e:
         return render_template("flights.html", items=[], cols=[], success='Error: ' + str(e))
+
+@app.route('/addFlightReq', methods=['GET'])
+def add_flights():
+    flightID = request.args.get('flightID').strip()
+    routeID = request.args.get('routeID').strip()
+    support_airline = request.args.get('support_airline').strip()
+    support_tail = request.args.get('support_tail').strip()
+    progress = request.args.get('progress').strip()
+    airplane_status = request.args.get('airplane_status').strip()
+    next_time = request.args.get('next_time').strip()
+    cost = request.args.get('cost').strip()
+    if flightID == '':
+        return redirect('/flights')
+    try:
+        with connection.cursor() as cursor:
+            # sql = "INSERT INTO `flight_tracking`.`airline` (`airlineID`,`revenue`) VALUES (%s, %s)"
+            # cursor.execute(sql, (airlineid, revenue))
+            # return render_template("add_airlines.html", success='Successful')
+
+            sql = "INSERT INTO flight (flightID, routeID, support_airline, support_tail, progress, " \
+                  " airplane_status, next_time,cost) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+
+            val = (flightID, routeID, support_airline, support_tail, progress, airplane_status, next_time, cost)
+
+            cursor.execute(sql, val)
+            connection.commit()
+            return redirect('/flights')
+
+    except Exception as e:
+        return redirect('/flights')
     
 ## Harish Functions
     
@@ -351,42 +398,6 @@ def add_location():
 
     except Exception as e:
         return render_template("add_locations.html", success='Can\'t add Location: ' + str(e))
-
-
-@app.route('/addFlightReq', methods=['GET'])
-def add_flights():
-    flightID = request.args.get('flightID').strip()
-    routeID = request.args.get('routeID').strip()
-    support_airline = request.args.get('support_airline').strip()
-    support_tail = request.args.get('support_tail').strip()
-    progress = request.args.get('progress').strip()
-    airplane_status = request.args.get('airplane_status').strip()
-    next_time = request.args.get('next_time').strip()
-    cost = request.args.get('cost').strip()
-    if flightID == '':
-        return render_template("add_flights.html", success='flightID cannot be empty')
-    try:
-        with connection.cursor() as cursor:
-            # sql = "INSERT INTO `flight_tracking`.`airline` (`airlineID`,`revenue`) VALUES (%s, %s)"
-            # cursor.execute(sql, (airlineid, revenue))
-            # return render_template("add_airlines.html", success='Successful')
-
-            sql = "INSERT INTO flight (flightID, routeID, support_airline, support_tail, progress, " \
-                  " airplane_status, next_time,cost) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-
-            val = (flightID, routeID, support_airline, support_tail, progress, airplane_status, next_time, cost)
-
-            cursor.execute(sql, val)
-            connection.commit()
-            return render_template("add_flights.html", success='Successful')
-
-            print(cursor.rowcount, "flight details inserted")
-
-            # disconnecting from server
-            connection.close()
-
-    except Exception as e:
-        return render_template("add_flights.html", success='Can\'t add flight: ' + str(e))
 
 
 @app.route('/addAirlineReq', methods=['GET'])
