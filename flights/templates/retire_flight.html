@@ -1,0 +1,20 @@
+{% extends "template.html" %}
+{% block action %}"/retireFlightReq"{% endblock %}
+{% block function %}"Update"{% endblock %}
+{% block fields %}
+<form action="/airflightinfo">
+   <label class="form-control" name="retireflightTitle" style="font-weight:bold">Retire Flight</label>
+    <br>
+    FlightID:
+    <br>
+        <select name="option2" width="3000px" class="form-control" >
+                    {% for o in items %}
+                        {% if o.flightID is defined and not empty %}
+                            <option value="{{o.flightID}}" SELECTED>{{o.flightID}}</option>
+                        {% else %}
+                            NONE
+                        {% endif %}
+                    {% endfor %}
+        </select>
+    <br>
+{% endblock %}

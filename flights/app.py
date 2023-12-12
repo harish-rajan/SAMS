@@ -47,9 +47,14 @@ def add_airplanes_page():
 def add_persons_page():
     return render_template("add_persons.html", success='')
 
+@app.route('/addRoutes')
+def add_routes_page():
+    return render_template("add_routes.html", success='')
+
 @app.route('/addAirlines')
 def add_airlines_page():
     return render_template("add_airlines.html", success='')
+
 
 
 @app.route('/addLocations')
@@ -66,6 +71,13 @@ def add_flights_page():
 def add_topics_page():
     return render_template("add_topics.html", success='')
 
+@app.route('/simulationCycle')
+def simulationCycle_page():
+    return render_template("simulation_cycle.html", success='')
+
+@app.route('/addPassengers')
+def add_passengers_page():
+  return render_template("add_passengers.html", success='')
 
 @app.route('/addLocationReq', methods=['GET'])
 def add_location():
@@ -94,6 +106,207 @@ def add_location():
         return render_template("add_locations.html", success='Can\'t add Location: ' + str(e))
 
 
+@app.route('/addAirports', methods=['GET'])
+def getlocationinfo():
+    try:
+        with connection.cursor() as cursor:
+            sql = "select * from location"
+            cols = ['locationID']
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            cursor.close()
+            return render_template("add_airports.html", items=result, cols=cols, success='')
+    except Exception as e:
+        return render_template("add_airports.html", items=[], cols=[], success='Can\'t get locations: ' + str(e))
+
+@app.route('/addAirportReq', methods=['GET'])
+def add_airport_req():
+    airportID = request.args.get('airportID')
+    airport_name = request.args.get('airport_name')
+    city = request.args.get('city')
+    state = request.args.get('state')
+    locationID = request.args.get('option2')
+    country = request.args.get('country')
+    try:
+        if not airportID or not airportID.strip():
+            return render_template("add_airports.html", success='airportID  cannot be empty')
+        if not airport_name or not airport_name.strip():
+            return render_template("add_airports.html", success='airport_name cannot be empty')
+        if not city or not city.strip():
+            return render_template("add_airports.html", success='city  cannot be empty')
+        if not state or not state.strip():
+            return render_template("add_airports.html", success='state cannot be empty')
+        # if not locationID or not locationID.strip():
+        #     return render_template("add_airports.html", success='locationID  cannot be empty')
+        if not country or not country.strip():
+            return render_template("add_airports.html", success='country  cannot be empty')
+
+        cursor = connection.cursor()
+
+        sql_proc = "call add_airport(%s, %s, %s, %s, %s, %s)"
+        args = [airportID.strip(), airport_name.strip(), city.strip(), state.strip(), country.strip(),
+                locationID.strip()]
+        cursor.execute(sql_proc, args)
+        connection.commit()
+        cursor.close()
+        return render_template("add_airports.html", items=[], cols=[], success='Completed')
+    except Exception as e:
+        return render_template("add_airports.html", success='Can\'t add airport: ' + str(e))
+
+@app.route('/simulationcycleReq')
+def simulationcycleReq_page():
+    try:
+        cursor = connection.cursor()
+        sql_proc = "call flight_tracking.simulation_cycle()"
+        cursor.execute(sql_proc)
+        connection.commit()
+        cursor.close()
+        return render_template("simulation_cycle.html", items=[], cols=[], success='Completed')
+    except Exception as e:
+        return render_template("simulation_cycle.html", items=[], cols=[], success='Can\'t Simulate: ' + str(e))
+@app.route('/addpersonflightInfo', methods=['GET'])
+def getpersonflightInfo():
+    results1 = []
+    d = {'personID': ''}
+    results1.append(d)
+    d = {'flightID': ''}
+    results1.append(d)
+
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM person"
+            cursor.execute(sql)
+            result1 = cursor.fetchall()
+            for r in result1:
+                d = {'personID': r.get('personID')}
+                results1.append(d)
+            cursor.close()
+
+        with connection.cursor() as cursor:
+            sql1 = "SELECT DISTINCT flightID FROM flight"
+            cursor.execute(sql1)
+            result2 = cursor.fetchall()
+            cursor.close()
+
+            results1.extend(result2)
+            cols = ['personID', 'flightID']
+
+            return render_template("assign_pilot.html", items=results1, cols=cols, success='')
+    except Exception as e:
+        return render_template("assign_pilot.html", items=[], cols=[], success='Can\'t get person flight Info: ' + str(e))
+
+@app.route('/assignpilotReq', methods=['GET'])
+def add_assignpilot_req():
+    personID = request.args.get('option1')
+    flightID = request.args.get('option2')
+
+    try:
+        if not personID or not personID.strip():
+            return render_template("assign_pilot.html", success='personID  cannot be empty')
+        if not flightID or not flightID.strip():
+            return render_template("assign_pilot.html", success='flightID cannot be empty')
+
+        cursor = connection.cursor()
+
+        sql_proc = "call assign_pilot(%s, %s)"
+        args = [personID.strip(), flightID.strip()]
+        cursor.execute(sql_proc, args)
+        connection.commit()
+        cursor.close()
+        return render_template("assign_pilot.html", items=[], cols=[], success='Completed')
+    except Exception as e:
+        return render_template("assign_pilot.html", success='Can\'t assign pilot: ' + str(e))
+
+
+@app.route('/addPassengerReq', methods=['GET'])
+def add_passengers():
+    passengerID = request.args.get('passengerID')
+    miles = int(request.args.get('miles'))
+    funds = int(request.args.get('funds'))
+
+    if passengerID == '':
+        return render_template("add_passengers.html", success='passengerID cannot be empty')
+    if miles == '':
+        return render_template("add_passengers.html", success='miles cannot be empty')
+    if funds == '':
+        return render_template("add_passengers.html", success='funds cannot be empty')
+    try:
+        with connection.cursor() as cursor:
+            cursor = connection.cursor()
+            sql_proc = "call add_passenger(%s, %s, %s)"
+            args = [passengerID, miles, funds]
+            cursor.execute(sql_proc, args)
+            connection.commit()
+            cursor.close()
+
+
+            return render_template("add_passengers.html", success='Successful')
+
+            print(cursor.rowcount, "passenger details inserted")
+
+            # disconnecting from server
+            connection.close()
+
+    except Exception as e:
+        return render_template("add_passengers.html", success='Can\'t add Passenger: ' + str(e))
+
+@app.route('/addRouteReq', methods=['GET'])
+def add_routes():
+    routeID = request.args.get('routeID').strip()
+    if routeID == '':
+        return render_template("add_passengers.html", success='routeID cannot be empty')
+
+    try:
+        with connection.cursor() as cursor:
+            # sql = "INSERT INTO `flight_tracking`.`airline` (`airlineID`,`revenue`) VALUES (%s, %s)"
+            # cursor.execute(sql, (airlineid, revenue))
+            # return render_template("add_airlines.html", success='Successful')
+
+            sql = "INSERT INTO route(routeID) VALUES (%s)"
+            val = (routeID)
+
+            cursor.execute(sql, val)
+            connection.commit()
+            return render_template("add_routes.html", success='Successful')
+
+            print(cursor.rowcount, "route details inserted")
+
+            # disconnecting from server
+            connection.close()
+
+    except Exception as e:
+        return render_template("add_routes.html", success='Can\'t add Routess: ' + str(e))
+
+@app.route('/getlicenseInfo', methods=['GET'])
+def getlicensetypeinfo():
+    results1 = []
+    d = {'personID': ''}
+    results1.append(d)
+    d = {'license': ''}
+    results1.append(d)
+
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT DISTINCT personID FROM person"
+            cursor.execute(sql)
+            result1 = cursor.fetchall()
+            for r in result1:
+                d = {'personID': r.get('personID')}
+                results1.append(d)
+            cursor.close()
+
+        with connection.cursor() as cursor:
+            sql1 = "SELECT DISTINCT license FROM pilot_licenses"
+            cursor.execute(sql1)
+            result2 = cursor.fetchall()
+            cursor.close()
+
+            results1.extend(result2)
+            cols = ['license', 'license']
+
+            return render_template("grantrevokelicense.html", items=results1, cols=cols, success='')
+    except Exception as e:
+        return render_template("grantrevokelicense.html", items=[], cols=[], success='Can\'t get person and license: ' + str(e))
 @app.route('/addFlightReq', methods=['GET'])
 def add_flights():
     flightID = request.args.get('flightID').strip()
@@ -157,6 +370,58 @@ def add_airline():
     except Exception as e:
         return render_template("add_airlines.html", success='Can\'t add Airline: ' + str(e))
 
+@app.route('/grantrevokelicensereq', methods=['GET'])
+def get_grantrevokelicense():
+    personID = request.args.get('option1').strip()
+    licenseID = request.args.get('option2').strip()
+    try:
+        cursor = connection.cursor()
+        sql_proc = "call flight_tracking.grant_or_revoke_pilot_license(%s,%s)"
+        args = [personID, licenseID]
+        # args = ['am_99']
+        cursor.execute(sql_proc, args)
+        connection.commit()
+        cursor.close()
+        return render_template("grantrevokelicense.html", items=[], cols=[], success='Completed')
+    except Exception as e:
+        return render_template("grantrevokelicense.html", items=[], cols=[], success='Can\'t grant license: ' + str(e))
+
+@app.route('/airflightinfo', methods=['GET'])
+def getflightinfo():
+    results1 = []
+    d = {'flightID': ''}
+    results1.append(d)
+
+    try:
+
+        with connection.cursor() as cursor:
+            sql1 = "SELECT flightID from flight"
+            cursor.execute(sql1)
+            result2 = cursor.fetchall()
+            cursor.close()
+            results1.extend(result2)
+            cols = ['flightID']
+
+            return render_template("retire_flight.html", items=results1, cols=cols, success='')
+    except Exception as e:
+        return render_template("retire_flight.html", items=[], cols=[], success='Can\'t get flights: ' + str(e))
+
+
+@app.route('/retireFlightReq', methods=['GET'])
+def retireFlightReq_page():
+    flightID = request.args.get('option2').strip()
+
+    try:
+        cursor = connection.cursor()
+        sql_proc = "call flight_tracking.retire_flight(%s)"
+        args = [flightID]
+        # args = ['am_99']
+        cursor.execute(sql_proc, args)
+        connection.commit()
+        cursor.close()
+        return render_template("retire_flight.html", items=[], cols=[], success='Completed')
+    except Exception as e:
+        return render_template("retire_flight.html", items=[], cols=[], success='Can\'t retire flight: ' + str(e))
 
 @app.route('/addairplaneReq', methods=['GET', 'POST'])
 def add_airplane():
@@ -276,7 +541,6 @@ def getairlineInfo():
     except Exception as e:
         return render_template("add_airplanes.html", items=[], cols=[], success='Can\'t get airlines: ' + str(e))
 
-
 @app.route('/recycleCrew')
 def recycle_crew_1_page():
     try:
@@ -308,7 +572,6 @@ def recycle_crew_2_page():
     except Exception as e:
         return render_template("confirmation.html", items=[], cols=[], success='Can\'t view Recycle Crew: ' + str(e))
 
-
 @app.route('/viewLocations')
 def view_locations_page():
     try:
@@ -321,6 +584,29 @@ def view_locations_page():
     except Exception as e:
         return render_template("view_locations.html", items=[], cols=[], success='Can\'t view Locations: ' + str(e))
 
+@app.route('/viewPassengers')
+def view_passengers_page():
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM `passenger`"
+            cols = ['passengerID', 'miles', 'funds']
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            return render_template("view_passengers.html", items=result, cols=cols, success='')
+    except Exception as e:
+        return render_template("view_passengers.html", items=[], cols=[], success='Can\'t view Passengers: ' + str(e))
+
+@app.route('/viewRoutes')
+def view_routes_page():
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM `route`"
+            cols = ['routeID']
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            return render_template("view_routes.html", items=result, cols=cols, success='')
+    except Exception as e:
+        return render_template("view_routes.html", items=[], cols=[], success='Can\'t view Routes: ' + str(e))
 
 @app.route('/viewFlights')
 def view_flights_page():
@@ -335,6 +621,61 @@ def view_flights_page():
     except Exception as e:
         return render_template("view_flights.html", items=[], cols=[], success='Can\'t view Flights: ' + str(e))
 
+
+@app.route('/viewflightsInair')
+def view_flightsinair_page():
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM flights_in_the_air"
+            cols = ['departing_from', 'arriving_at', 'num_flights', 'flight_list', 'earliest_arrival',
+                    'latest_arrival', 'airplane_list']
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            return render_template("view_flightsinair.html", items=result, cols=cols, success='')
+    except Exception as e:
+        return render_template("view_flightsinair.html", items=[], cols=[], success='Can\'t view Flights In air: ' + str(e))
+
+
+@app.route('/viewflightsonGround')
+def view_flightsonground_page():
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM flights_on_the_ground"
+            cols = ['departing_from', 'num_flights', 'flight_list', 'earliest_arrival',
+                    'latest_arrival', 'airplane_list']
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            return render_template("view_flightsonground.html", items=result, cols=cols, success='')
+    except Exception as e:
+        return render_template("view_flightsonground.html", items=[], cols=[], success='Can\'t view Flights: ' + str(e))
+
+
+@app.route('/viewpassengersonGround')
+def view_passengersonground_page():
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM people_on_the_ground"
+            cols = ['departing_from', 'airport', 'airport_name', 'city',
+                    'state', 'country', 'num_pilots', 'num_passengers', 'joint_pilots_passengers', 'person_list']
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            return render_template("view_passengersonground.html", items=result, cols=cols, success='')
+    except Exception as e:
+        return render_template("view_passengersonground.html", items=[], cols=[], success='Can\'t view Passengers on Ground: ' + str(e))
+
+
+@app.route('/viewpassengersinair')
+def view_passengersinair_page():
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM people_in_the_air"
+            cols = ['departing_from', 'arriving_at', 'num_airplanes', 'airplane_list',
+                    'flight_list', 'earliest_arrival', 'latest_arrival', 'num_pilots', 'num_passengers', 'joint_pilots_passengers', 'person_list']
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            return render_template("view_passengersinair.html", items=result, cols=cols, success='')
+    except Exception as e:
+        return render_template("view_passengersinair.html", items=[], cols=[], success='Can\'t view Passengers on Ground: ' + str(e))
 
 @app.route('/viewAirplanes')
 def view_airplanes_page():

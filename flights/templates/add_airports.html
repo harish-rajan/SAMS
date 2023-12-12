@@ -1,10 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "template.html" %}
+{% block action %}"/addAirportReq"{% endblock %}
+{% block function %}"Add"{% endblock %}
+{% block fields %}
+    <label class="form-control" name="airporttitle" style="font-weight:bold">Add AirPort</label>
+    <br>
+    <table>
+         <tr>
+            <td>Airport ID: <input type="text" class="form-control" name="airportID" required></td>
+            <td>Airport Name:   <input type="text" class="form-control" name="airport_name" required></td>
+        </tr>
+         <tr>
+            <td>City: <input type="text" class="form-control" name="city" required></td>
+            <td>State:   <input type="text" class="form-control" name="state" required></td>
+        </tr>
+        <tr>
+            <td>Country: <input type="text" class="form-control" name="country" required></td>
+            <td><label>Location :</label>
+                <select name="option2" width="3000px" class="form-control" >
+                    {% for o in items %}
+                        {% if o.locationID is defined and not empty %}
+                            <option value="{{o.locationID}}" SELECTED>{{o.locationID}}</option>
+                        {% else %}
+                            NONE
+                        {% endif %}
+                    {% endfor %}
+                </select></td>
+        </tr>
 
-</body>
-</html>
+    </table>
+
+{% endblock %}

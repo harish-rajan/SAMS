@@ -39,7 +39,7 @@
     <table>
         <tr>
             <td >
-                <div class="well"  style="width: 500px;">
+                <div class="well"  style="width: 400px;">
         <h4>Airline</h4>
         <div class="container" style="display:flex; text-align:center;">
 
@@ -47,11 +47,11 @@
                 <input type="submit" class="btn btn-default" value="View Airline"/>
             </form>
             <div style="margin:5px;"></div>
-            <form action="/addAirlines">
+            <form action="/addAirlines" hidden="true">
                 <input type="submit" class="btn btn-info" value="Add Airlines"/>
             </form>
             <div style="margin:5px;"></div>
-             <form action="/updateAirlines">
+             <form action="/updateAirlines" hidden="true">
                 <input type="submit" class="btn btn-primary" value="Update Airlines"/>
             </form>
             <div style="margin:5px;"></div>
@@ -67,11 +67,11 @@
                 <input type="submit" class="btn btn-default" value="View Airplanes"/>
             </form>
             <div style="margin:5px;"></div>
-            <form action="/airlineInfo">
+            <form action="/addAirplanes">
                 <input type="submit" class="btn btn-info" value="Add Airplanes"/>
             </form>
             <div style="margin:5px;"></div>
-            <form action="/updateAirplanes">
+            <form action="/updateAirplanes" hidden="true">
                 <input type="submit" class="btn btn-primary" value="Update Airplanes"/>
             </form>
             <div style="margin:5px;"></div>
@@ -82,7 +82,7 @@
         </tr>
         <tr>
             <td >
-                <div class="well"  style="width: 500px;">
+                <div class="well"  style="width: 400px;">
         <h4>Airports</h4>
         <div class="container" style="display:flex; text-align:center;">
 
@@ -94,7 +94,7 @@
                 <input type="submit" class="btn btn-info" value="Add Airports"/>
             </form>
             <div style="margin:5px;"></div>
-             <form action="/updateAirports">
+             <form action="/updateAirports" hidden="true">
                 <input type="submit" class="btn btn-primary" value="Update Airports"/>
             </form>
             <div style="margin:5px;"></div>
@@ -114,7 +114,7 @@
                 <input type="submit" class="btn btn-info" value="Add Routes"/>
             </form>
             <div style="margin:5px;"></div>
-            <form action="/updateRoutes">
+            <form action="/updateRoutes" hidden="true">
                 <input type="submit" class="btn btn-primary" value="Update Routes"/>
             </form>
             <div style="margin:5px;"></div>
@@ -127,18 +127,18 @@
             </td>
         </tr>
         <tr >
-            <td ><div class="well" style="width: 500px;">
+            <td ><div class="well" style="width: 400px;">
         <h4>Locations</h4>
         <div class="container" style="display:flex; text-align:center;">
             <form action="/viewLocations">
                 <input type="submit" class="btn btn-default" value="View Locations"/>
             </form>
             <div style="margin:5px;"></div>
-            <form action="/addLocations">
+            <form action="/addLocations" hidden="true">
                 <input type="submit" class="btn btn-info" value="Add Locations"/>
             </form>
             <div style="margin:5px;"></div>
-            <form action="/updateLocations">
+            <form action="/updateLocations" hidden="true">
                 <input type="submit" class="btn btn-primary" value="Update Locations"/>
             </form>
             <div style="margin:5px;"></div>
@@ -160,7 +160,7 @@
                             </form>&nbsp;&nbsp;
                         </td>
                         <td>
-                             <form action="/retireFlights">
+                             <form action="/airflightinfo">
                              <input type="submit" class="btn btn-primary" value="Retire Flights"/>
                              </form>&nbsp;&nbsp;
                         </td>
@@ -176,7 +176,7 @@
                              &nbsp;
                         </td>
                         <td>
-                             <form action="/landingFlights">
+                             <form action="/landingFlightsInfo">
                              <input type="submit" class="btn btn-info" value="Landing Flights"/>
                             </form>
 
@@ -193,39 +193,7 @@
     </div></td>
         </tr>
         <tr>
-            <td><div class="well" style="width: 500px;">
-        <h4>Pilots</h4>
-         <table>
-             <tr>
-                 <td> <form action="/viewPilots">
-                <input type="submit" class="btn btn-default" value="View Pilots"/>
-            </form>&nbsp;</td>
-                 <td><form action="/addPilots">
-                <input type="submit" class="btn btn-info" value="Add Pilots"/>
-            </form>&nbsp;</td>
-                 <td> <form action="/updatePilots">
-                <input type="submit" class="btn btn-primary" value="Update Pilots"/>
-            </form>&nbsp;</td>
-                 <td><form action="/assignPilots">
-                <input type="submit" class="btn btn-default" value="Assign Pilots"/>
-            </form>&nbsp;</td>
-             </tr>
-
-             <tr>
-                 <td> &nbsp;
-            </td>
-                 <td>
-            <form action="/grantPilotlicense">
-                <input type="submit" class="btn btn-default" value="Grant License"/>
-            </form></td>&nbsp;
-                 <td>&nbsp;</td>
-             </tr>
-         </table>
-
-
-       </div>
-            </td>
-            <td> <div class="well" style="width: 600px;">
+            <td> <div class="well" style="width: 400px;">
         <h4>Persons</h4>
         <div class="container" style="display:flex; text-align:center;">
             <form action="/viewPersons">
@@ -236,18 +204,45 @@
                 <input type="submit" class="btn btn-info" value="Add Persons"/>
             </form>
             <div style="margin:5px;"></div>
-            <form action="/boardPersonss">
+            <form action="/boardPersons" hidden="true">
                 <input type="submit" class="btn btn-primary" value="Board Persons"/>
             </form>
             <div style="margin:5px;"></div>
 
         </div>
     </div></td>
+            <td><div class="well" style="width: 500px;">
+
+
+
+                  <h4>Pilots</h4>
+                <div class="container" style="display:flex; text-align:center;">
+            <form action="/viewPilots">
+                <input type="submit" class="btn btn-default" value="View Pilots"/>
+            </form>&nbsp;
+            <div style="margin:5px;"></div>
+            <form action="/addpersonflightInfo">
+                 <input type="submit" class="btn btn-info" value="Assign Pilots"/>
+             </form>&nbsp;
+            <div style="margin:5px;"></div>
+            <form action="/getlicenseInfo">
+                <input type="submit" class="btn btn-default" value="Grant- Revoke License"/>
+            </form>
+            <div style="margin:5px;"></div>
+             <form action="/addPilots" hidden="true">
+                 <input type="submit" class="btn btn-info" value="Add Pilots"/>
+             </form>&nbsp;
+            <div style="margin:5px;"></div>
+        </div>
+    </div>
+            </td>
+             </tr>
+         </table>
+       </div>
+            </td>
 
         </tr>
-         <tr>
-            <td>
-            </td>
+        <tr>
             <td> <div class="well" style="width: 600px;">
         <h4>Passengers</h4>
         <div class="container" style="display:flex; text-align:center;">
@@ -268,7 +263,8 @@
             </form>
         </div>
     </div></td>
-
+        <td>
+            </td>
         </tr>
     </table>
    <table>
@@ -289,19 +285,19 @@
         <td> <div class="well" style="width: 600px;">
         <h4>Flights & People (In Air - On Ground)</h4>
         <div class="container" style="display:flex; text-align:center;">
-            <form action="/flightsInair">
+            <form action="/viewflightsInair">
                 <input type="submit" class="btn btn-default" value="Flights In Air"/>
             </form>
             <div style="margin:5px;"></div>
-            <form action="/flightsonGround">
+            <form action="/viewflightsonGround">
                 <input type="submit" class="btn btn-info" value="Flights on ground"/>
             </form>
             <div style="margin:5px;"></div>
-             <form action="/passengersInair">
+             <form action="/viewpassengersinair">
                 <input type="submit" class="btn btn-primary" value="Passengers In air"/>
             </form>
             <div style="margin:5px;"></div>
-            <form action="/passengersonGround">
+            <form action="/viewpassengersonGround">
                 <input type="submit" class="btn btn-default" value="Passengers on ground"/>
             </form>
             <div style="margin:5px;"></div>
@@ -315,3 +311,4 @@
 </div>
 </body>
 </html>
+

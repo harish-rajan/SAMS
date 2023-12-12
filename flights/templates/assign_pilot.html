@@ -1,0 +1,32 @@
+{% extends "template.html" %}
+{% block action %}"/assignpilotReq"{% endblock %}
+{% block function %}"Assign"{% endblock %}
+{% block fields %}
+
+   <label class="form-control" name="assignflightTitle" style="font-weight:bold">Assign Flight</label>
+    <br>
+    Person ID:
+    <br>
+        <select name="option1" width="3000px" class="form-control" >
+                    {% for o in items %}
+                        {% if o.personID is defined and not empty %}
+                            <option value="{{o.personID}}" SELECTED>{{o.personID}}</option>
+                        {% else %}
+                            NONE
+                        {% endif %}
+                    {% endfor %}
+        </select>
+    <br>
+    FlightID:
+    <br>
+        <select name="option2" width="3000px" class="form-control" >
+                    {% for o in items %}
+                        {% if o.flightID is defined and not empty %}
+                            <option value="{{o.flightID}}" SELECTED>{{o.flightID}}</option>
+                        {% else %}
+                            NONE
+                        {% endif %}
+                    {% endfor %}
+        </select>
+    <br>
+{% endblock %}

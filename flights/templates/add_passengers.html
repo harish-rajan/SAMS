@@ -1,0 +1,22 @@
+{% extends "template.html" %}
+{% block action %}"/addPassengerReq"{% endblock %}
+{% block function %}"Add"{% endblock %}
+{% block fields %}
+<label class="form-control" name="addPassengers" style="font-weight:bold">Add Passengers</label>
+   <br>
+    personID:
+    <br>
+    <input type="text" class="form-control" name="personID" required>
+    <br>
+    miles:
+    <br>
+    <input type="text" class="form-control" name="miles" required>
+    <br>
+    funds:
+    <br>
+    <input type="text" class="form-control" name="funds">
+    <br>
+
+
+
+{% endblock %}
