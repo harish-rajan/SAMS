@@ -209,8 +209,8 @@ def flights():
         with connection.cursor() as cursor:
             sql = "select t1.support_airline, t1.flightID, t1.support_tail, t1.airplane_status, t1.routeID, t1.progress, " \
                 "t3.departure, t3.arrival, t1.next_time, t1.cost " \
-                "from flight t1 join route_path t2 on t1.routeID = t2.routeID and t1.progress = t2.sequence " \
-                "join leg t3 on t2.legID = t3.legID"
+                "from flight t1 left join route_path t2 on t1.routeID = t2.routeID and t1.progress = t2.sequence " \
+                "left join leg t3 on t2.legID = t3.legID"
 
             cols = ['support_airline', 'flightID', 'support_tail', 'airplane_status', 'routeID', 'progress', 'departure', 'arrival', 'next_time', 'cost']
             cursor.execute(sql)
@@ -236,32 +236,20 @@ def flights():
     except Exception as e:
         return render_template("flights.html", items=[], cols=[], success='Error: ' + str(e))
 
-## this is wrong
-
 @app.route('/addFlightReq', methods=['GET'])
 def add_flights():
     flightID = request.args.get('flightID').strip()
     routeID = request.args.get('routeID').strip()
     support_airline = request.args.get('support_airline').strip()
     support_tail = request.args.get('support_tail').strip()
-    progress = request.args.get('progress').strip()
-    airplane_status = request.args.get('airplane_status').strip()
+    progress = int(request.args.get('progress'))
     next_time = request.args.get('next_time').strip()
-    cost = request.args.get('cost').strip()
-    if flightID == '':
-        return redirect('/flights')
+    cost = int(request.args.get('cost'))
     try:
         with connection.cursor() as cursor:
-            # sql = "INSERT INTO `flight_tracking`.`airline` (`airlineID`,`revenue`) VALUES (%s, %s)"
-            # cursor.execute(sql, (airlineid, revenue))
-            # return render_template("add_airlines.html", success='Successful')
+            args = (flightID, routeID, support_airline, support_tail, progress, next_time, cost)
 
-            sql = "INSERT INTO flight (flightID, routeID, support_airline, support_tail, progress, " \
-                  " airplane_status, next_time,cost) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-
-            val = (flightID, routeID, support_airline, support_tail, progress, airplane_status, next_time, cost)
-
-            cursor.execute(sql, val)
+            cursor.callproc('offer_flight', args)
             connection.commit()
             return redirect('/flights')
 
