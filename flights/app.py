@@ -272,7 +272,7 @@ def add_flights():
 def takeoff(flightID):
     try:
         with connection.cursor() as cursor:
-            args = (flightID)
+            args = (flightID,)
             cursor.callproc('flight_takeoff', args)
             connection.commit()
             return redirect('/flights')
@@ -283,8 +283,30 @@ def takeoff(flightID):
 def landing(flightID):
     try:
         with connection.cursor() as cursor:
-            args = (flightID)
+            args = (flightID,)
             cursor.callproc('flight_landing', args)
+            connection.commit()
+            return redirect('/flights')
+    except Exception as e:
+        return redirect('/flights')
+    
+@app.route('/flights/<flightID>/board')
+def board(flightID):
+    try:
+        with connection.cursor() as cursor:
+            args = (flightID,)
+            cursor.callproc('bassengers_board', args)
+            connection.commit()
+            return redirect('/flights')
+    except Exception as e:
+        return redirect('/flights')
+    
+@app.route('/flights/<flightID>/disembark')
+def disembark(flightID):
+    try:
+        with connection.cursor() as cursor:
+            args = (flightID,)
+            cursor.callproc('passengers_disembark', args)
             connection.commit()
             return redirect('/flights')
     except Exception as e:

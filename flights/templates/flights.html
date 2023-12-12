@@ -19,7 +19,7 @@
                     <th scope="col">Flight Number</th>
                     <th scope="col">Aircraft Tail Number</th>
                     <th scope="col">Status</th>
-                    <th scope="col"></th>
+                    <th scope="col" colspan="3"></th>
                     <th scope="col">Route</th>
                     <th scope="col">Progress</th>
                     <th scope="col">Departure Airport</th>
@@ -36,13 +36,21 @@
                     <td>{{ item['flightID'] }}</td>
                     <td>{{ item['support_tail'] }}</td>
                     <td>{{ item['airplane_status'] }}</td>
-                    <td>
-                        {% if item['airplane_status'] == 'on_ground' %}
-                        <a class="btn btn-link" href="/flights/{{ item['flightID'] }}/takeoff">Takeoff</a>
-                        {% else %}
-                        <a class="btn btn-link" href="/flights/{{ item['flightID'] }}/landing">Land</a>
-                        {% endif %}
+                    {% if item['airplane_status'] == 'on_ground' %}
+                    <td class="text-center align-middle">
+                        <a class="btn btn-primary" href="/flights/{{ item['flightID'] }}/disembark">Disembark</a>
                     </td>
+                    <td class="text-center align-middle">
+                        <a class="btn btn-primary" href="/flights/{{ item['flightID'] }}/board">Board</a>
+                    </td>
+                    <td class="text-center align-middle">
+                        <a class="btn btn-primary" href="/flights/{{ item['flightID'] }}/takeoff">Takeoff</a>
+                    </td>
+                    {% else %}
+                    <td class="text-center align-middle" colspan="3">
+                        <a class="btn btn-primary btn-block w-100" href="/flights/{{ item['flightID'] }}/landing">Land</a>
+                    </td>
+                    {% endif %}
                     <td>{{ item['routeID'] }}</td>
                     <td>{{ item['progress'] }}</td>
                     <td>{{ item['departure'] }}</td>
@@ -67,8 +75,13 @@
             <div class="modal-body">
                 <form class="row g-3" id="offerFlightForm" action="/addFlightReq" method="get">
                     <div class="col-4">
-                        <label for="inputFlight"  class="form-label">Flight Number</label>
-                        <input class="form-control" type="text" id="inputFlight" name="flightID">
+                        <label for="inputAirline" class="form-label">Airline</label>
+                        <select class="form-select" id="inputAirline" value="" name="support_airline">
+                            <option hidden disabled selected value></option>
+                            {% for airline in airlines %}
+                            <option value="{{ airline['airlineID'] }}">{{ airline['airlineID'] }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="col-4">
                         <label for="inputRoute" class="form-label">Route</label>
@@ -80,13 +93,8 @@
                         </select>
                     </div>
                     <div class="col-4">
-                        <label for="inputAirline" class="form-label">Airline</label>
-                        <select class="form-select" id="inputAirline" value="" name="support_airline">
-                            <option hidden disabled selected value></option>
-                            {% for airline in airlines %}
-                            <option value="{{ airline['airlineID'] }}">{{ airline['airlineID'] }}</option>
-                            {% endfor %}
-                        </select>
+                        <label for="inputFlight"  class="form-label">Flight Number</label>
+                        <input class="form-control" type="text" id="inputFlight" name="flightID">
                     </div>
                     <div class="col-4">
                         <label for="inputTailNum" class="form-label">Aircraft Tail Number</label>
@@ -97,15 +105,15 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-6">
+                    <div class="col-2">
                         <label for="inputProgress" class="form-label">Progress</label>
                         <input class="form-control" type="number" id="inputProgress" name="progress">
                     </div>
-                    <div class="col-6">
+                    <div class="col-3">
                         <label class="form-label" for="inputNextTime">Takeoff Time</label>
                         <input class="form-control" type="time" id="inputNextTime" name="next_time">
                     </div>
-                    <div class="col-6">
+                    <div class="col-3">
                         <label class="form-label" for="inputCost">Cost</label>
                         <input class="form-control" type="number" id="inputCost" name="cost">
                     </div>
