@@ -283,7 +283,7 @@ def board(flightID):
     try:
         with connection.cursor() as cursor:
             args = (flightID,)
-            cursor.callproc('bassengers_board', args)
+            cursor.callproc('passengers_board', args)
             connection.commit()
             return redirect('/flights')
     except Exception as e:
