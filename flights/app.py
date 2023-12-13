@@ -358,3 +358,65 @@ def retire_flight(flightID):
     except Exception as e:
         return redirect(f'/flights/{flightID}')
     
+@app.route('/views')
+def views():
+    try:
+        with connection.cursor() as cursor:
+            sql1 = "SELECT * FROM flights_in_the_air"
+            flightsInAirCols = ['departing_from', 'arriving_at', 'num_flights', 'flight_list', 'earliest_arrival',
+                    'latest_arrival', 'airplane_list']
+            cursor.execute(sql1)
+            flightsInAir = cursor.fetchall()
+
+            sql2 = "SELECT * FROM flights_on_the_ground"
+            flightsOnGroundCols = ['departing_from', 'num_flights', 'flight_list', 'earliest_arrival',
+                    'latest_arrival', 'airplane_list']
+            cursor.execute(sql2)
+            flightsOnGround = cursor.fetchall()
+
+            sql3 = "SELECT * FROM people_in_the_air"
+            peopleInAirCols = ['departing_from', 'arriving_at', 'num_airplanes', 'airplane_list',
+                    'flight_list', 'earliest_arrival', 'latest_arrival', 'num_pilots', 'num_passengers', 'joint_pilots_passengers', 'person_list']
+            cursor.execute(sql3)
+            peopleInAir = cursor.fetchall()
+
+            sql4 = "SELECT * FROM people_on_the_ground"
+            peopleOnGroundCols = ['departing_from', 'airport', 'airport_name', 'city',
+                    'state', 'country', 'num_pilots', 'num_passengers', 'joint_pilots_passengers', 'person_list']
+            cursor.execute(sql4)
+            peopleOnGround = cursor.fetchall()
+
+            sql5 = "SELECT * FROM route_summary"
+            routeSummaryCols = ['route', 'num_legs', 'leg_sequence', 'route_length',
+                    'num_flights', 'flight_list', 'airport_sequence']
+            cursor.execute(sql5)
+            routeSummary = cursor.fetchall()
+
+            sql6 = "SELECT * FROM alternative_airports"
+            alternativeAirportCols = ['city', 'state', 'country', 'num_airports',
+                    'airport_code_list', 'airport_name_list']
+            cursor.execute(sql6)
+            alternativeAirport = cursor.fetchall()
+
+            return render_template("views.html", flightsInAirCols=flightsInAirCols, flightsInAir=flightsInAir, 
+                                   flightsOnGroundCols=flightsOnGroundCols, flightsOnGround=flightsOnGround,
+                                   peopleInAirCols=peopleInAirCols, peopleInAir=peopleInAir,
+                                   peopleOnGroundCols=peopleOnGroundCols, peopleOnGround=peopleOnGround,
+                                   routeSummaryCols=routeSummaryCols, routeSummary=routeSummary,
+                                   alternativeAirportCols=alternativeAirportCols, alternativeAirport=alternativeAirport,
+                                   success='')
+    except Exception as e:
+        return render_template("views.html", flightsInAirCols=[], flightsInAir=[], flightsOnGroundCols=[], flightsOnGround=[],
+                                   peopleInAirCols=[], peopleInAir=[], peopleOnGroundCols=[], peopleOnGround=[],
+                                   routeSummaryCols=[], routeSummary=[], alternativeAirportCols=[], alternativeAirport=[],
+                               success='Error: ' + str(e))
+    
+@app.route('/simulationCycle')
+def simulation_cycle():
+    try:
+        with connection.cursor() as cursor:
+            cursor.callproc('simulation_cycle', None)
+            connection.commit()
+            return redirect(f'/views')
+    except Exception as e:
+        return redirect(f'/views')
