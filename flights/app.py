@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 
 
-@app.route('/home')
+@app.route('/')
 def home():
     return render_template("home.html")
 
@@ -256,6 +256,30 @@ def add_flights():
     except Exception as e:
         return redirect('/flights')
     
+@app.route('/flights/<flightID>')
+def flight(flightID):
+    try:
+        with connection.cursor() as cursor:
+            sql = "select t1.support_airline, t1.flightID, t1.support_tail, t1.airplane_status, t1.routeID, t1.progress, " \
+                "t3.departure, t3.arrival, t1.next_time, t1.cost " \
+                "from flight t1 left join route_path t2 on t1.routeID = t2.routeID and t1.progress = t2.sequence " \
+                f"left join leg t3 on t2.legID = t3.legID where t1.flightID = '{flightID}'"
+
+            cols = ['airlineid', 'tail_num', 'seat_capacity', 'speed', 'locationID', 'plane_type', 'skids',
+                    'propellers', 'jet_engines']
+            cursor.execute(sql)
+            items = cursor.fetchall()
+
+            sql2 = "select t1.personID, concat(t2.first_name, ' ', t2.last_name) as name from pilot t1 join person t2 " \
+                "on t1.personID = t2.personID where t1.commanding_flight is null"
+            
+            cursor.execute(sql2)
+            pilots = cursor.fetchall()
+
+            return render_template("flight.html", items=items, cols=cols, pilots=pilots, flightID=flightID, success='')
+    except Exception as e:
+        return render_template("flight.html", items=[], cols=[], success='Error: ' + str(e))
+    
 @app.route('/flights/<flightID>/takeoff')
 def takeoff(flightID):
     try:
@@ -263,9 +287,9 @@ def takeoff(flightID):
             args = (flightID,)
             cursor.callproc('flight_takeoff', args)
             connection.commit()
-            return redirect('/flights')
+            return redirect(f'/flights/{flightID}')
     except Exception as e:
-        return redirect('/flights')
+        return redirect(f'/flights/{flightID}')
     
 @app.route('/flights/<flightID>/landing')
 def landing(flightID):
@@ -274,9 +298,9 @@ def landing(flightID):
             args = (flightID,)
             cursor.callproc('flight_landing', args)
             connection.commit()
-            return redirect('/flights')
+            return redirect(f'/flights/{flightID}')
     except Exception as e:
-        return redirect('/flights')
+        return redirect(f'/flights/{flightID}')
     
 @app.route('/flights/<flightID>/board')
 def board(flightID):
@@ -285,9 +309,9 @@ def board(flightID):
             args = (flightID,)
             cursor.callproc('passengers_board', args)
             connection.commit()
-            return redirect('/flights')
+            return redirect(f'/flights/{flightID}')
     except Exception as e:
-        return redirect('/flights')
+        return redirect(f'/flights/{flightID}')
     
 @app.route('/flights/<flightID>/disembark')
 def disembark(flightID):
@@ -296,295 +320,41 @@ def disembark(flightID):
             args = (flightID,)
             cursor.callproc('passengers_disembark', args)
             connection.commit()
-            return redirect('/flights')
+            return redirect(f'/flights/{flightID}')
     except Exception as e:
-        return redirect('/flights')
+        return redirect(f'/flights/{flightID}')
     
-## Harish Functions
-    
-@app.route('/')
-def login():
-    return render_template("index.html")
-
-@app.route('/addAirplanes')
-def add_airplanes_page():
-    return render_template("add_airplanes.html", success='')
-
-
-
-@app.route('/viewAirplanes')
-def view_airplanes_page():
+@app.route('/flights/<flightID>/assignPilotReq')
+def assign_pilot(flightID):
     try:
         with connection.cursor() as cursor:
-            sql = "Select airplane.airlineid, tail_num, seat_capacity, speed,locationID,plane_type, " \
-                  "skids,propellers,jet_engines FROM airplane " \
-                  "JOIN airline  ON airplane.airlineid = airline.airlineid"
-
-            cols = ['airlineid', 'tail_num', 'seat_capacity', 'speed', 'locationID', 'plane_type', 'skids',
-                    'propellers', 'jet_engines']
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            return render_template("view_airplanes.html", items=result, cols=cols, success='')
-    except Exception as e:
-        return render_template("view_airplanes.html", items=[], cols=[], success='Can\'t view Airplane: ' + str(e))
-
-@app.route('/airlineInfo', methods=['GET'])
-def getairlineInfo():
-    results1 = []
-    d = {'airlineID': ''}
-    results1.append(d)
-    d = {'locationID': ''}
-    results1.append(d)
-
-    try:
-        with connection.cursor() as cursor:
-            sql = "SELECT * FROM airline"
-            cursor.execute(sql)
-            result1 = cursor.fetchall()
-            for r in result1:
-                d = {'airlineID': r.get('airlineID')}
-                results1.append(d)
-            cursor.close()
-
-        with connection.cursor() as cursor:
-            sql1 = "SELECT l.locationID FROM location l LEFT JOIN airplane a ON l.locationID = a.locationID where a.locationID IS NOT NULL"
-            cursor.execute(sql1)
-            result2 = cursor.fetchall()
-            cursor.close()
-
-            results1.extend(result2)
-            cols = ['airlineID', 'locationID']
-
-            return render_template("add_airplanes.html", items=results1, cols=cols, success='')
-    except Exception as e:
-        return render_template("add_airplanes.html", items=[], cols=[], success='Can\'t get airlines: ' + str(e))
-
-
-# @app.route('/')
-# def index():
-#     try:
-#         with connection.cursor() as cursor:
-#             sql = "SELECT DISTINCT airlineID,revenue FROM airline"
-#             cols = ['airlineID', 'revenue']
-#             cursor.execute(sql)
-#             airplanelist = cursor.fetchall()
-#             return render_template('add_airplanes.html', airplanelist=airplanelist,content_type='application/json')
-#     except Exception as e:
-#         return render_template('add_airplanes.html', items=[], cols=[], success='Can\'t view Airplane: ' + str(e))
-
-@app.route('/homeAdmin')
-def home_admin():
-    return render_template("home_admin.html")
-
-
-@app.route('/homeUser')
-def home_user():
-    return render_template("home_user.html")
-
-
-
-@app.route('/addPersons')
-def add_persons_page():
-    return render_template("add_persons.html", success='')
-
-@app.route('/addAirlines')
-def add_airlines_page():
-    return render_template("add_airlines.html", success='')
-
-
-@app.route('/addLocations')
-def add_locations_page():
-    return render_template("add_locations.html", success='')
-
-
-@app.route('/addFlights')
-def add_flights_page():
-    return render_template("add_flights.html", success='')
-
-
-@app.route('/addTopics')
-def add_topics_page():
-    return render_template("add_topics.html", success='')
-
-
-@app.route('/addLocationReq', methods=['GET'])
-def add_location():
-    locationID = request.args.get('locationID').strip()
-    if locationID == '':
-        return render_template("add_location.html", success='locationID cannot be empty')
-    try:
-        with connection.cursor() as cursor:
-            # sql = "INSERT INTO `flight_tracking`.`airline` (`airlineID`,`revenue`) VALUES (%s, %s)"
-            # cursor.execute(sql, (airlineid, revenue))
-            # return render_template("add_airlines.html", success='Successful')
-
-            sql = "INSERT INTO location(locationID) VALUES (%s)"
-            val = (locationID)
-
-            cursor.execute(sql, val)
+            personID = request.args.get('personID').strip()
+            args = (flightID, personID)
+            cursor.callproc('assign_pilot', args)
             connection.commit()
-            return render_template("add_locations.html", success='Successful')
-
-            print(cursor.rowcount, "location details inserted")
-
-            # disconnecting from server
-            connection.close()
-
+            return redirect(f'/flights/{flightID}')
     except Exception as e:
-        return render_template("add_locations.html", success='Can\'t add Location: ' + str(e))
-
-
-@app.route('/addAirlineReq', methods=['GET'])
-def add_airline():
-    airlineid = request.args.get('airlineid').strip()
-    revenue = request.args.get('revenue').strip()
-    if airlineid == '' or revenue == '':
-        return render_template("add_airlines.html", success='AirlineID or Revenue cannot be empty')
-    try:
-        with connection.cursor() as cursor:
-            # sql = "INSERT INTO `flight_tracking`.`airline` (`airlineID`,`revenue`) VALUES (%s, %s)"
-            # cursor.execute(sql, (airlineid, revenue))
-            # return render_template("add_airlines.html", success='Successful')
-
-            sql = "INSERT INTO airline (airlineID, revenue) VALUES (%s, %s)"
-            val = (airlineid, revenue)
-
-            cursor.execute(sql, val)
-            connection.commit()
-            return render_template("add_airlines.html", success='Successful')
-
-            print(cursor.rowcount, "airline details inserted")
-
-            # disconnecting from server
-            connection.close()
-
-    except Exception as e:
-        return render_template("add_airlines.html", success='Can\'t add Airline: ' + str(e))
-
-
-
-
-
-@app.route('/updateAirlines')
-def update_airlines_page():
-    return render_template("update_airlines.html", success='')
-
-
-@app.route('/updateAirlineReq', methods=['GET'])
-def update_airline():
-    airlineid = request.args.get('airlineid').strip()
-    # old_revenue = request.args.get('old_revenue').strip()
-    # new_airlineid = request.args.get('new_airlineid').strip()
-    new_revenue = request.args.get('new_revenue').strip()
-    if airlineid == '' or new_revenue == '':
-        return render_template("update_airlines.html", success='Fields cannot be empty')
-    try:
-        with connection.cursor() as cursor:
-            sql = "UPDATE airline SET revenue = %s WHERE airlineid =%s"
-            val = (new_revenue, airlineid)
-            cursor.execute(sql, val)
-            connection.commit()
-            return render_template("update_airlines.html", success='Successful')
-    except Exception as e:
-        return render_template("update_airlines.html", success='Can\'t update Airline: ' + str(e))
-
-
-@app.route('/recycleCrew')
-def recycle_crew_1_page():
-    try:
-        with connection.cursor() as cursor:
-            sql = "SELECT * FROM flight"
-            cols = ['airplane_status', 'flightID', 'next_time', 'progress', 'routeID', 'support_airline',
-                    'support_tail']
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            cursor.close()
-            return render_template("recycle_crew.html", items=result, cols=cols, success='')
-    except Exception as e:
-        return render_template("recycle_crew.html", items=[], cols=[], success='Can\'t view Recycle Crew: ' + str(e))
-
-
-@app.route('/recycleCrew2', methods=['GET'])
-def recycle_crew_2_page():
-    flightID = request.args.get('option').strip()
-
-    try:
-        cursor = connection.cursor()
-        sql_proc = "call flight_tracking.recycle_crew(%s)"
-        args = [flightID]
-        # args = ['am_99']
-        cursor.execute(sql_proc, args)
-        connection.commit()
-        cursor.close()
-        return render_template("confirmation.html", items=[], cols=[], success='Completed')
-    except Exception as e:
-        return render_template("confirmation.html", items=[], cols=[], success='Can\'t view Recycle Crew: ' + str(e))
-
-
-@app.route('/viewLocations')
-def view_locations_page():
-    try:
-        with connection.cursor() as cursor:
-            sql = "SELECT * FROM `location`"
-            cols = ['locationID']
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            return render_template("view_locations.html", items=result, cols=cols, success='')
-    except Exception as e:
-        return render_template("view_locations.html", items=[], cols=[], success='Can\'t view Locations: ' + str(e))
-
-
-@app.route('/viewFlights')
-def view_flights_page():
-    try:
-        with connection.cursor() as cursor:
-            sql = "SELECT * FROM flight"
-            cols = ['flightID', 'routeID', 'support_airline', 'support_trail', 'progress', 'airplane_status',
-                    'next_time', 'cost']
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            return render_template("view_flights.html", items=result, cols=cols, success='')
-    except Exception as e:
-        return render_template("view_flights.html", items=[], cols=[], success='Can\'t view Flights: ' + str(e))
-
-
-@app.route('/viewAirline')
-def view_airline_page():
-    try:
-        with connection.cursor() as cursor:
-            sql = "SELECT * FROM `airline`"
-            cols = ['airlineID', 'revenue']
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            return render_template("view_airline.html", items=result, cols=cols, success='')
-    except Exception as e:
-        return render_template("view_airline.html", items=[], cols=[], success='Can\'t view Airline: ' + str(e))
-
-@app.route('/viewPersons')
-def view_persons_page():
-    try:
-        with connection.cursor() as cursor:
-            sql = "SELECT * FROM person"
-            cols = ['personID', 'first_name', 'last_name', 'locationID']
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            return render_template("view_persons.html", items=result, cols=cols, success='')
-    except Exception as e:
-        return render_template("view_persons.html", items=[], cols=[], success='Can\'t view Persons: ' + str(e))
+        return redirect(f'/flights/{flightID}')
     
-@app.route('/viewPilots')
-def view_pilots_page():
+@app.route('/flights/<flightID>/recycleCrew')
+def recycle_crew(flightID):
     try:
         with connection.cursor() as cursor:
-            sql = "SELECT t2.first_name, t2.last_name, t1.taxID, t1.experience, t1.commanding_flight FROM pilot t1 JOIN person t2 ON t1.personID = t2.personID"
-            cols = ['first_name', 'last_name', 'taxID', 'experience', 'commanding_flight']
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            return render_template("view_pilots.html", items=result, cols=cols, success='')
+            args = (flightID,)
+            cursor.callproc('recycle_crew', args)
+            connection.commit()
+            return redirect(f'/flights/{flightID}')
     except Exception as e:
-        return render_template("view_pilots.html", items=[], cols=[], success='Can\'t view Pilots: ' + str(e))
+        return redirect(f'/flights/{flightID}')
     
-
-
-if __name__ == '__main__':
-    app.run()
+@app.route('/flights/<flightID>/retireFlight')
+def retire_flight(flightID):
+    try:
+        with connection.cursor() as cursor:
+            args = (flightID,)
+            cursor.callproc('retire_flight', args)
+            connection.commit()
+            return redirect(f'/flights')
+    except Exception as e:
+        return redirect(f'/flights/{flightID}')
+    
